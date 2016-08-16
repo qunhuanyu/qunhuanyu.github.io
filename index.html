@@ -1,0 +1,167 @@
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<script src="http://lib.sinaapp.com/js/jquery/1.9.1/jquery-1.9.1.min.js"></script>
+<script src="./jquery.danmu.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/randomcolor/0.4.4/randomColor.min.js"></script>
+<!--script src="//cdn.bootcss.com/marked/0.3.6/marked.min.js"></script-->
+<style type="text/css">
+    #danmuarea {
+      position: fixed;
+      background-color:rgba(0,0,0,0);
+      width:100%;
+      height: 150px;
+      margin-left: auto;
+      margin-right: auto;
+    pointer-events: none;  
+    }
+    /*#ds-thread #ds-reset .ds-comments > li:first-child {
+        position:absolute;
+        top:-200px;
+    }*/
+    #header {
+        overflow: visible;
+    }
+    #danmuswitch {
+        border: 1px solid #ccc;
+        background-color: transparent;
+        text-shadow: 0 1px 0 #fff;
+        padding: 3px 5px;
+        display: inline;
+        webkit-border-radius: 5px;
+        border-radius: 5px;
+        cursor: pointer;
+        text-decoration: none;
+        color: #777;
+        font-size: 13px;
+    }
+</style>
+</head>
+<body>
+<div id="danmuarea"><div id="danmu" ></div></div>
+<div id="header">
+<a id="danmuswitch" href="javascript:void(0);">开启弹幕</a>
+<div class="jiathis_style" style="float: right">
+    <!--a href="http://www.jiathis.com/share" class="jiathis jiathis_txt jtico jtico_jiathis" target="_blank"></a-->
+    <a class="jiathis_button_weixin"></a>
+    <a class="jiathis_button_tsina"></a>
+    <a class="jiathis_button_cqq"></a>
+    <a class="jiathis_button_qzone"></a>
+    <a class="jiathis_counter_style"></a>
+</div>
+</div>
+<div class="ds-thread" data-thread-key="/" data-title="/" data-url="/"></div>
+<script type="text/javascript">
+var duoshuoQuery = {short_name:"qunhuanyu"};
+(function() {
+    $('.ds-thread').attr('data-thread-key', location.search.substr(1) || '/');
+    $('.ds-thread').attr('data-title', location.search.substr(1) || '/');
+    $('.ds-thread').attr('data-url', location.href);
+	var ds = document.createElement('script');
+	ds.type = 'text/javascript';ds.async = false;
+	ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+	ds.charset = 'UTF-8';
+	ds.onload = ds.onreadystatechange = function() {
+        setTimeout(function () {
+            $('.ds-thread .ds-comments-tab-duoshuo').html($('.ds-thread .ds-comments-tab-duoshuo').html().replace('评论','帖子'));
+            $('.ds-toolbar-buttons').append(' - 图床: <a href="http://www.tietuku.com/" target="_blank">tietuku</a> / <a href="http://yotuku.cn/" target="_blank">yotuku</a> / <a href="http://sm.ms/" target="_blank">sm</a> - <a href="javascript:articleLink();">本文</a> - <a href="javascript:newArticle();">新文</a>');
+            danmuInit();
+            run();
+        }, 1000);
+    };
+	(document.getElementsByTagName('head')[0] 
+	 || document.getElementsByTagName('body')[0]).appendChild(ds);
+})();
+function danmuInit() {
+  $("#danmu").danmu({
+    left:0,
+    top:0,
+    height:"100%",
+    width:"100%",
+    speed:20000,
+    opacity:1,
+    font_size_small:16,
+    font_size_big:24,
+    top_botton_danmu_time:6000
+  });
+  $('#danmu').danmu('danmuStart');
+}
+var BASE_DIGIT = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
+function newArticle() {
+    var link = location.pathname + '?' + '000000'.replace(/0/g, function(){return BASE_DIGIT[(0|Math.random()*62)];});
+    $('.ds-replybox textarea').val('<a href="' + link + '">新文章标题</a>');
+    //window.open(link);
+}
+function articleLink() {
+    $('.ds-replybox textarea').val('<a href="' + location.href + '">' + document.title + '</a>');
+}
+var old_len = 0;
+function run() {
+    var article = $('.ds-comments li')[0];
+    //var name = $('.ds-avatar > a', $(article)).attr('title');
+    document.title  = $('p', article).text().split('\n')[0].substr(0, 40);
+    //var names = $('.ds-comments li .ds-comment-header a');
+    var comments = $('.ds-comment-body p');
+    var len = comments.length;
+    if (!old_len) old_len = len;
+    if ($('#danmuswitch').text() == '关闭弹幕') {
+        var r = [];
+        for (var i = len - 1; i >= 1; --i) {
+            var t = $(comments[i]).text().split('\n')[0].substr(0, 40);
+            if (!t) continue;
+            //t = $(names[i]).text() + '—' + t;
+            var c = randomColor({
+                luminosity: 'bright',
+                hue: 'random'
+            });
+            var a = {text:t, color:c, size:1, position:0, time:$('#danmu').data("nowTime")+(len-i)*10};
+            if (i >= old_len) {
+                a.isnew = true;
+            }
+            r.push(a);
+        }    
+        $("#danmu").danmu("addDanmu", r);
+    }
+    old_len = len;
+    setTimeout(run, 1000*(len+1));    
+}
+$('#danmuswitch').click(function (e) {
+    if ($('#danmuswitch').text() == '开启弹幕') {
+        $('#danmu').danmu('setOpacity', 1);
+        $('#danmuswitch').text('关闭弹幕');
+        $('#danmuswitch').css('background-color','transparent');
+    } else {
+        $('#danmu').danmu('setOpacity', 0);
+        $('#danmuswitch').text('开启弹幕');
+        $('#danmuswitch').css('background-color', 'rgba(0,0,0,0.04)');
+    }
+})
+/*$(document).bind('DOMNodeInserted', function(event) {
+    element = event.target;
+    if (element.nodeName == 'UL' && element.className == 'ds-comments') {
+        $('.ds-comment-body p', $(element)).each(function (i, e) {
+            $(e).html(marked($(e).html().replace('<br>','\n')));
+        });
+    }
+    if (element.nodeName == 'LI' && element.className == 'ds-post') {
+        e = $('.ds-comment-body p', $(element));
+        e.html(marked(e.html().replace('<br>','\n')));
+    }
+});*/
+</script>
+<!--script src="http://strapdownjs.com/v/0.2/strapdown.js"></script-->
+<script type="text/javascript" src="http://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+<script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+    tex2jax: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+<script src="http://v3.jiathis.com/code/jia.js" charset="utf-8"></script>
+</body>
