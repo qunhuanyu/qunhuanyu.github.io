@@ -64,7 +64,7 @@ var duoshuoQuery = {short_name:"qunhuanyu"};
 	ds.onload = ds.onreadystatechange = function() {
         setTimeout(function () {
             $('.ds-thread .ds-comments-tab-duoshuo').html($('.ds-thread .ds-comments-tab-duoshuo').html().replace('评论','帖子'));
-            $('.ds-toolbar-buttons').append(' - 图床: <a href="http://www.tietuku.com/" target="_blank">tietuku</a> / <a href="http://yotuku.cn/" target="_blank">yotuku</a> / <a href="http://sm.ms/" target="_blank">sm</a> - <a href="javascript:articleLink();">本文</a> - <a href="javascript:newArticle();">新文</a>');
+            $('.ds-toolbar-buttons').append(' - 图床：<a href="http://yotuku.cn/" target="_blank">1</a> / <a href="http://sm.ms/" target="_blank">2</a> - 链接：<a href="javascript:newArticle();">新帖</a> / <a href="javascript:articleLink();">本帖</a>');
             danmuInit();
             run();
         }, 1000);
